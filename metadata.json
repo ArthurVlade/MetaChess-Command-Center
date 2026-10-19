@@ -1,0 +1,6 @@
+{
+  "name": "MetaChess Command Center",
+  "description": "Real-time Ray-Ban Meta Smart Glasses + Windows WhatsApp Desktop + Gemini Vision + Stockfish pipeline and Command Center HUD",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

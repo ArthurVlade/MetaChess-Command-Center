@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MetaChess Command Center - Windows Ray-Ban Meta + WhatsApp Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #080d16;
+      --card-bg: #0f172a;
+      --card-border: #1e293b;
+      --card-hover: #1e293b;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+      --accent-violet: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    header {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.35);
+    }
+
+    .brand-title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-live {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--accent-emerald);
+      color: var(--accent-emerald);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent-emerald);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 8px #10b981; }
+      100% { transform: scale(0.9); opacity: 0.7; }
+    }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      gap: 6px;
+      background: #090f1d;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 18px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn.active {
+      background: #1e293b;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .action-btn {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+
+    .action-btn:hover {
+      background: #334155;
+    }
+
+    .action-btn.primary {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: white;
+    }
+
+    .action-btn.primary:hover {
+      background: #0369a1;
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      background: #0b1325;
+      border-bottom: 1px solid var(--card-border);
+      padding: 10px 28px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      padding: 24px 28px;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* TAB 1: WORKFLOW CANVAS */
+    .canvas-wrapper {
+      position: relative;
+      background: radial-gradient(circle at 50% 50%, #0d1627 0%, #080d16 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 36px 28px;
+      min-height: 720px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .canvas-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .canvas-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .canvas-subtitle {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .nodes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .node-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .node-card:hover {
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    .node-card.active-stage {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
+    }
+
+    .node-card.pulsing {
+      animation: node-pulse 1.8s infinite;
+    }
+
+    @keyframes node-pulse {
+      0% { border-color: #06b6d4; box-shadow: 0 0 10px rgba(6, 182, 212, 0.3); }
+      50% { border-color: #10b981; box-shadow: 0 0 25px rgba(16, 185, 129, 0.5); }
+      100% { border-color: #06b6d4; box-shadow: 0 0 10px rgba(6, 182, 212, 0.3); }
+    }
+
+    .node-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .node-num-tag {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #1e293b;
+      color: var(--accent-cyan);
+      letter-spacing: 0.5px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .node-status-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      background: #1e293b;
+      color: var(--text-muted);
+    }
+
+    .node-status-pill.confirmed { background: rgba(16,185,129,0.2); color: #10b981; }
+    .node-status-pill.watching { background: rgba(245,158,11,0.2); color: #f59e0b; }
+    .node-status-pill.ready { background: rgba(6,182,212,0.2); color: #06b6d4; }
+
+    .node-name {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .node-quote {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: #cbd5e1;
+      font-style: italic;
+      background: rgba(0,0,0,0.25);
+      padding: 10px 12px;
+      border-left: 3px solid var(--accent-cyan);
+      border-radius: 0 6px 6px 0;
+    }
+
+    .node-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 10px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* TAB 2: COMMAND CENTER & BROADCAST */
+    .hud-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1100px) {
+      .nodes-grid { grid-template-columns: 1fr; }
+      .hud-grid { grid-template-columns: 1fr; }
+    }
+
+    .hud-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hud-card-header {
+      padding: 14px 18px;
+      background: #141f36;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .hud-card-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Giant Move Banner */
+    .giant-move-box {
+      background: linear-gradient(135deg, #091322, #0d1e38);
+      border: 2px solid var(--accent-emerald);
+      border-radius: 10px;
+      padding: 20px;
+      margin: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+    }
+
+    .move-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .move-label {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--accent-emerald);
+      text-transform: uppercase;
+    }
+
+    .giant-move-text {
+      font-size: 34px;
+      font-weight: 900;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .eval-badge {
+      font-size: 20px;
+      font-weight: 800;
+      background: rgba(16,185,129,0.2);
+      border: 1px solid var(--accent-emerald);
+      color: #10b981;
+      padding: 4px 12px;
+      border-radius: 6px;
+    }
+
+    /* Visual Screen / Video Player */
+    .video-viewport {
+      position: relative;
+      background: #000;
+      width: 100%;
+      height: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .video-viewport img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .viewport-overlay-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(0,0,0,0.75);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 11.5px;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 4px 10px;
+      border-radius: 4px;
+      z-index: 10;
+    }
+
+    /* Evidence Badges */
+    .evidence-bar {
+      padding: 14px 18px;
+      background: #0c1424;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .evidence-chip {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .evidence-chip.valid {
+      border-color: var(--accent-emerald);
+      color: #a7f3d0;
+      background: rgba(16,185,129,0.12);
+    }
+
+    /* Commit Logs Table */
+    .commits-section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      background: #141f36;
+      color: var(--text-muted);
+      text-align: left;
+      padding: 10px 14px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-family: 'JetBrains Mono', monospace;
+      color: #e2e8f0;
+    }
+
+    tr:hover td {
+      background: rgba(255,255,255,0.02);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+          <path d="M2 17l10 5 10-5"></path>
+          <path d="M2 12l10 5 10-5"></path>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">
+          MetaChess Command Center
+          <span class="badge-live"><span class="pulse-dot"></span> LIVE PIPELINE</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dual Tab Switcher -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="btn-tab-canvas" onclick="switchTab('canvas')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        Tab 1: Workflow Canvas
+      </button>
+      <button class="tab-btn" id="btn-tab-command" onclick="switchTab('command')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+        Tab 2: Command Center & Broadcast
+      </button>
+    </div>
+
+    <!-- Actions -->
+    <div class="header-actions">
+      <a href="/visual-return" target="_blank" class="action-btn primary" title="Pop-out 1280x720 HUD for OBS or WhatsApp Screen Share">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+        Pop-out Visual Return
+      </a>
+      <button class="action-btn" onclick="resetGame()">
+        Reset Game
+      </button>
+    </div>
+  </header>
+
+  <!-- Live Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-label">Glasses Video In (Eyes)</span>
+      <span class="stat-value" id="stat-fps">1.0 FPS</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Total Frames Processed</span>
+      <span class="stat-value" id="stat-frames">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Jev Cost Saved (USD)</span>
+      <span class="stat-value" id="stat-cost" style="color: #10b981;">$0.0000</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Frames Skipped (Cost Filter)</span>
+      <span class="stat-value" id="stat-skip-pct">0.0%</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Confirmed Moves</span>
+      <span class="stat-value" id="stat-moves">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Stockfish Engine</span>
+      <span class="stat-value" id="stat-engine" style="color: #06b6d4;">Ready</span>
+    </div>
+  </div>
+
+  <main>
+    <!-- TAB 1: WORKFLOW CANVAS -->
+    <div id="tab-canvas" class="tab-content active">
+      <div class="canvas-wrapper">
+        <div class="canvas-header">
+          <div>
+            <div class="canvas-title">Interactive 6-Node Architecture Graph</div>
+            <div class="canvas-subtitle">Ray-Ban Meta Smart Glasses & Windows WhatsApp Desktop Real-Time Vision Pipeline</div>
+          </div>
+          <div class="badge-live">Live State Tracking Enabled</div>
+        </div>
+
+        <div class="nodes-grid">
+          <!-- Node 1 -->
+          <div class="node-card active-stage pulsing" id="node-card-1">
+            <div class="node-header">
+              <span class="node-num-tag">NODE 01</span>
+              <span class="node-status-pill ready">STREAMING</span>
+            </div>
+            <div class="node-name">Call Video and Speech</div>
+            <div class="node-quote">
+              "This is the app's eyes and mouth — how pictures get in and how moves get out. Both lean on Windows and WhatsApp. The app never logs into WhatsApp; whatever account is signed in on the device is the one the glasses call and you answer."
+            </div>
+            <div class="node-meta">
+              <span>Source: Windows WhatsApp</span>
+              <span>1.0 FPS | 12ms</span>
+            </div>
+          </div>
+
+          <!-- Node 2 -->
+          <div class="node-card" id="node-card-2">
+            <div class="node-header">
+              <span class="node-num-tag">NODE 02</span>
+              <span class="node-status-pill ready">JEV ACTIVE</span>
+            </div>
+            <div class="node-name">The Jev Pre-Check</div>
+            <div class="node-quote">
+              "Jev is an optional cheap and fast AI check that looks at each frame before the expensive vision model does. Its only job is to save money by skipping frames that can't teach the app anything."
+            </div>
+            <div class="node-meta">
+              <span>Stage 2A OpenCV + 2B Flash-Lite</span>
+              <span id="node-2-meta">45ms | 68% saved</span>
+            </div>
+          </div>
+
+          <!-- Node 3 -->
+          <div class="node-card" id="node-card-3">
+            <div class="node-header">
+              <span class="node-num-tag">NODE 03</span>
+              <span class="node-status-pill watching" id="node-3-pill">WATCHING</span>
+            </div>
+            <div class="node-name">Move Confirmed (Reverse Agent)</div>
+            <div class="node-quote">
+              "Move confirmed: Needs the same best-fit move on 2+ frames in a row and 3+ squares of evidence, otherwise keep watching (reverse agent)."
+            </div>
+            <div class="node-meta">
+              <span>Gate: 2+ Frames & 3+ Squares</span>
+              <span id="node-3-meta">Matched: 0/2</span>
+            </div>
+          </div>
+
+          <!-- Node 4 -->
+          <div class="node-card" id="node-card-4">
+            <div class="node-header">
+              <span class="node-num-tag">NODE 04</span>
+              <span class="node-status-pill ready">ANALYZING</span>
+            </div>
+            <div class="node-name">Engine Turn Prompt</div>
+            <div class="node-quote">
+              "Committed and it's your turn, ask the engine for the best move. Send the current board position to Stockfish and return its recommended move and evaluation."
+            </div>
+            <div class="node-meta">
+              <span>Engine: Stockfish 16+ UCI</span>
+              <span id="node-4-meta">Best: e4 (+0.35)</span>
+            </div>
+          </div>
+
+          <!-- Node 5 -->
+          <div class="node-card" id="node-card-5">
+            <div class="node-header">
+              <span class="node-num-tag">NODE 05</span>
+              <span class="node-status-pill">LOGGING</span>
+            </div>
+            <div class="node-name">Commit is Logged</div>
+            <div class="node-quote">
+              "Commit is logged for Command Center — appends immutable commit record with ply, SAN, UCI, square evidence list, evaluation, and frame thumbnail."
+            </div>
+            <div class="node-meta">
+              <span>Store: Memory & SQLite</span>
+              <span id="node-5-meta">Commits: 0</span>
+            </div>
+          </div>
+
+          <!-- Node 6 -->
+          <div class="node-card" id="node-card-6">
+            <div class="node-header">
+              <span class="node-num-tag">NODE 06</span>
+              <span class="node-status-pill ready">BROADCASTING</span>
+            </div>
+            <div class="node-name">Record and Broadcast</div>
+            <div class="node-quote">
+              "Record and broadcast a game — saves live PGN/video telemetry and streams the visual recommendation overlay to the Command Center and virtual video call feed."
+            </div>
+            <div class="node-meta">
+              <span>OBS Virtual Cam / PGN</span>
+              <span>1280x720 @ 20fps</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: COMMAND CENTER & BROADCAST -->
+    <div id="tab-command" class="tab-content">
+      <!-- Giant Visual Return Banner -->
+      <div class="giant-move-box">
+        <div class="move-left">
+          <span class="move-label">Giant High-Contrast Move Recommendation (Video Call Return)</span>
+          <div class="giant-move-text">
+            <span>BEST MOVE:</span>
+            <span id="banner-move" style="color: #38bdf8;">e4</span>
+            <span style="font-size: 22px; color: #94a3b8;">(e2 -> e4)</span>
+          </div>
+        </div>
+        <div>
+          <span class="eval-badge" id="banner-eval">+0.35</span>
+        </div>
+      </div>
+
+      <div class="hud-grid">
+        <!-- Live WhatsApp Camera Frame -->
+        <div class="hud-card">
+          <div class="hud-card-header">
+            <span class="hud-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 7l-7 5 7 5V7z"></path>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+              </svg>
+              Node 1: WhatsApp Video Call Feed (Glasses POV)
+            </span>
+            <span class="node-status-pill ready">Active 1.0 FPS</span>
+          </div>
+          <div class="video-viewport">
+            <span class="viewport-overlay-badge" id="source-badge">WINDOWS WHATSAPP SCREEN GRAB</span>
+            <img id="img-raw-feed" src="" alt="WhatsApp Glasses Frame" />
+          </div>
+          <div class="evidence-bar" id="evidence-container">
+            <span style="font-size: 12px; color: var(--text-muted); margin-right: 8px;">Reverse Agent Evidence (3+ Squares):</span>
+            <span class="evidence-chip valid">e2: empty (96%)</span>
+            <span class="evidence-chip valid">e4: white_pawn (98%)</span>
+            <span class="evidence-chip valid">d2: white_pawn (92%)</span>
+          </div>
+        </div>
+
+        <!-- Visual Return Broadcast Frame (1280x720 HUD) -->
+        <div class="hud-card">
+          <div class="hud-card-header">
+            <span class="hud-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="10 8 16 12 10 16 10 8"></polygon>
+              </svg>
+              Node 6: Visual Return Broadcast (Virtual Cam / OBS)
+            </span>
+            <span class="node-status-pill ready">1280x720 HUD</span>
+          </div>
+          <div class="video-viewport">
+            <span class="viewport-overlay-badge">OBS VIRTUAL CAMERA RETURN STREAM</span>
+            <img id="img-hud-feed" src="" alt="Visual Return HUD Stream" />
+          </div>
+          <div class="evidence-bar" style="justify-content: space-between;">
+            <div style="font-size: 12px; color: var(--text-muted);">
+              Consensus State: <strong id="consensus-status-txt" style="color: #10b981;">KEEP_WATCHING</strong>
+            </div>
+            <div>
+              <a href="/api/pgn" download="game.pgn" class="action-btn" style="padding: 4px 10px; font-size: 11px;">
+                Download PGN
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Commit Logs Table -->
+      <div class="commits-section">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="font-size: 16px; font-weight: 700;">Node 5: Command Center Commit Logs</h3>
+          <span style="font-size: 12px; color: var(--text-muted);">Real-time reverse-agent committed moves</span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Commit ID</th>
+                <th>Time</th>
+                <th>Ply</th>
+                <th>Move (SAN)</th>
+                <th>UCI</th>
+                <th>Evidence Squares</th>
+                <th>Stockfish Eval</th>
+                <th>Best Reply</th>
+              </tr>
+            </thead>
+            <tbody id="commits-table-body">
+              <tr>
+                <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                  Waiting for first move to be confirmed by Reverse Agent...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function switchTab(tab) {
+      document.getElementById('tab-canvas').classList.remove('active');
+      document.getElementById('tab-command').classList.remove('active');
+      document.getElementById('btn-tab-canvas').classList.remove('active');
+      document.getElementById('btn-tab-command').classList.remove('active');
+
+      if (tab === 'canvas') {
+        document.getElementById('tab-canvas').classList.add('active');
+        document.getElementById('btn-tab-canvas').classList.add('active');
+      } else {
+        document.getElementById('tab-command').classList.add('active');
+        document.getElementById('btn-tab-command').classList.add('active');
+      }
+    }
+
+    // Connect WebSocket
+    const wsProto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(`${wsProto}//${location.host}/ws`);
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        updateDashboard(data);
+      } catch (e) {
+        console.error("WS Parse error", e);
+      }
+    };
+
+    function updateDashboard(data) {
+      if (data.type !== 'PIPELINE_TELEMETRY') return;
+
+      // Stats
+      if (data.stats) {
+        document.getElementById('stat-frames').textContent = data.stats.total_frames || 0;
+        document.getElementById('stat-cost').textContent = `$${(data.stats.cost_saved_usd || 0).toFixed(4)}`;
+        document.getElementById('stat-skip-pct').textContent = `${data.stats.skip_percentage || 0}%`;
+        document.getElementById('stat-moves').textContent = data.stats.confirmed_moves || 0;
+      }
+
+      // Stockfish Banner
+      if (data.stockfish) {
+        document.getElementById('banner-move').textContent = data.stockfish.best_move_san || 'e4';
+        document.getElementById('banner-eval').textContent = data.stockfish.eval_str || '+0.00';
+        document.getElementById('node-4-meta').textContent = `Best: ${data.stockfish.best_move_san} (${data.stockfish.eval_str})`;
+      }
+
+      // Consensus info
+      if (data.consensus) {
+        const cStatus = data.consensus.status || 'KEEP_WATCHING';
+        document.getElementById('consensus-status-txt').textContent = cStatus;
+        document.getElementById('node-3-meta').textContent = `Matched: ${data.consensus.consecutive_matches || 0}/${data.consensus.required_consecutive || 2}`;
+        const p = document.getElementById('node-3-pill');
+        if (p) {
+          p.textContent = cStatus;
+          p.className = `node-status-pill ${cStatus === 'MOVE_CONFIRMED' ? 'confirmed' : 'watching'}`;
+        }
+      }
+
+      // Images
+      if (data.raw_frame_url) {
+        document.getElementById('img-raw-feed').src = data.raw_frame_url;
+      }
+      if (data.hud_frame_url) {
+        document.getElementById('img-hud-feed').src = data.hud_frame_url;
+      }
+
+      // Evidence Badges
+      if (data.observed_squares && data.observed_squares.length > 0) {
+        const cont = document.getElementById('evidence-container');
+        cont.innerHTML = '<span style="font-size: 12px; color: var(--text-muted); margin-right: 8px;">Reverse Agent Evidence (3+ Squares):</span>';
+        data.observed_squares.forEach(sq => {
+          const chip = document.createElement('span');
+          chip.className = `evidence-chip ${sq.confidence >= 0.8 ? 'valid' : ''}`;
+          chip.textContent = `${sq.square}: ${sq.state} (${Math.round(sq.confidence * 100)}%)`;
+          cont.appendChild(chip);
+        });
+      }
+
+      // Commits
+      if (data.commits && data.commits.length > 0) {
+        const tbody = document.getElementById('commits-table-body');
+        tbody.innerHTML = '';
+        data.commits.forEach(c => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${c.commit_id}</td>
+            <td>${c.timestamp}</td>
+            <td>#${c.ply}</td>
+            <td style="font-weight: 700; color: #38bdf8;">${c.san}</td>
+            <td>${c.uci}</td>
+            <td>${(c.evidence_squares || []).join(', ')}</td>
+            <td style="color: #10b981;">${c.eval}</td>
+            <td>${c.stockfish_reply || '-'}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+    }
+
+    async function resetGame() {
+      await fetch('/api/reset', { method: 'POST' });
+    }
+  </script>
+</body>
+</html>
